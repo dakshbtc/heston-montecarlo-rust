@@ -7,40 +7,21 @@ Heston (1993) stochastic volatility model via Monte Carlo simulation.
 
 ## Table of Contents
 
-1. [Why Not Black-Scholes?](#1-why-not-black-scholes)
-2. [The Heston Model](#2-the-heston-model)
-3. [Risk-Neutral Pricing](#3-risk-neutral-pricing)
-4. [Discretisation — Euler-Maruyama](#4-discretisation--euler-maruyama)
-5. [Correlated Brownian Motions via Cholesky](#5-correlated-brownian-motions-via-cholesky)
-6. [Numerical Stability Fixes](#6-numerical-stability-fixes)
-7. [Monte Carlo Estimator](#7-monte-carlo-estimator)
-8. [Variance Reduction — Antithetic Variates](#8-variance-reduction--antithetic-variates)
-9. [Performance Optimisations](#9-performance-optimisations)
-10. [Put-Call Parity Sanity Check](#10-put-call-parity-sanity-check)
-11. [Project Structure](#11-project-structure)
-12. [Running](#12-running)
+1. [The Heston Model](#1-the-heston-model)
+2. [Risk-Neutral Pricing](#2-risk-neutral-pricing)
+3. [Discretisation — Euler-Maruyama](#3-discretisation--euler-maruyama)
+4. [Correlated Brownian Motions via Cholesky](#4-correlated-brownian-motions-via-cholesky)
+5. [Numerical Stability Fixes](#5-numerical-stability-fixes)
+6. [Monte Carlo Estimator](#6-monte-carlo-estimator)
+7. [Variance Reduction — Antithetic Variates](#7-variance-reduction--antithetic-variates)
+8. [Performance Optimisations](#8-performance-optimisations)
+9. [Put-Call Parity Sanity Check](#9-put-call-parity-sanity-check)
+10. [Project Structure](#10-project-structure)
+11. [Running](#11-running)
 
 ---
 
-## 1. Why Not Black-Scholes?
-
-Black-Scholes (1973) assumes that the asset's **volatility is constant** over
-time. In reality:
-
-- Implied volatility extracted from market option prices forms a **smile** (or
-  skew) — deep in/out-of-the-money options trade at higher implied vol than
-  at-the-money options. A constant-vol model cannot reproduce this.
-- **Volatility clusters** — calm periods are followed by turbulent ones
-  (GARCH-like behaviour in returns).
-- **Leverage effect** — when equity prices fall, volatility tends to rise
-  (negative price/vol correlation).
-
-The Heston model addresses all three by making variance itself a stochastic
-process.
-
----
-
-## 2. The Heston Model
+## 1. The Heston Model
 
 Proposed by Steven Heston (1993), the model specifies two coupled stochastic
 differential equations (SDEs) under the risk-neutral measure \(\mathbb{Q}\):
@@ -86,7 +67,7 @@ many calibrated models violate Feller, so numerical truncation is required (see
 
 ---
 
-## 3. Risk-Neutral Pricing
+## 2. Risk-Neutral Pricing
 
 The fair price of any derivative is the **discounted expected payoff under the
 risk-neutral measure \(\mathbb{Q}\)**:
@@ -106,7 +87,7 @@ Because the Heston model has stochastic volatility, there is no closed-form
 
 ---
 
-## 4. Discretisation — Euler-Maruyama
+## 3. Discretisation — Euler-Maruyama
 
 We partition \([0, T]\) into \(N\) equal steps of size \(\Delta t = T/N\).
 
@@ -253,7 +234,7 @@ fine time grids (\(\Delta t = 1/252\)).
 
 ---
 
-## 5. Correlated Brownian Motions via Cholesky
+## 4. Correlated Brownian Motions via Cholesky
 
 We need two **correlated** standard normal increments at each step. The trick is
 Cholesky decomposition of the 2×2 correlation matrix:
@@ -284,7 +265,7 @@ let dw2 = (heston.rho * z1 + rho_perp * z2) * sqrt_dt;
 
 ---
 
-## 6. Numerical Stability Fixes
+## 5. Numerical Stability Fixes
 
 ### Full-Truncation Scheme for \(v\)
 
@@ -320,7 +301,7 @@ more paths, so this implementation uses Euler for simplicity.
 
 ---
 
-## 7. Monte Carlo Estimator
+## 6. Monte Carlo Estimator
 
 Given \(N\) simulated terminal prices \(S_T^{(1)}, \ldots, S_T^{(N)}\), the
 price estimator is:
@@ -345,7 +326,7 @@ techniques.
 
 ---
 
-## 8. Variance Reduction — Antithetic Variates
+## 7. Variance Reduction — Antithetic Variates
 
 ### The Idea
 
@@ -396,7 +377,7 @@ let dw2_anti = -(rho * z1  + rho_perp * z2)  * sqrt_dt;  // same as negating z1,
 
 ---
 
-## 9. Performance Optimisations
+## 8. Performance Optimisations
 
 ### Parallelism with Rayon
 
@@ -454,7 +435,7 @@ cycle).
 
 ---
 
-## 10. Put-Call Parity Sanity Check
+## 9. Put-Call Parity Sanity Check
 
 For European options under any model (no arbitrage is sufficient, no model
 assumptions needed), the following identity holds exactly:
@@ -472,7 +453,7 @@ typically a few cents for 100k paths.
 
 ---
 
-## 11. Project Structure
+## 10. Project Structure
 
 ```
 heston-mc/
@@ -487,7 +468,7 @@ heston-mc/
 
 ---
 
-## 12. Running
+## 11. Running
 
 ```bash
 # Debug build (slower, overflow checks enabled)
